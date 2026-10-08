@@ -26,6 +26,7 @@ export function Nav() {
       <strong>OWASP Lab Shop</strong>
       <Link href="/products">Products</Link>
       <Link href="/orders">My orders</Link>
+      {loggedIn && <Link href="/profile">Profile</Link>}
       <span className="spacer" />
       {loggedIn ? (
         <button className="link" onClick={logout}>

@@ -7,10 +7,10 @@ import { Product } from '../products/product.entity';
 import { User, UserRole } from '../users/user.entity';
 
 // Development-only credentials. They are documented in the README on purpose.
-const USERS: { email: string; password: string; role: UserRole }[] = [
-  { email: 'alice@lab.test', password: 'alice-pass-1', role: 'user' },
-  { email: 'bob@lab.test', password: 'bob-pass-1', role: 'user' },
-  { email: 'admin@lab.test', password: 'admin-pass-1', role: 'admin' },
+const USERS: { email: string; name: string; password: string; role: UserRole }[] = [
+  { email: 'alice@lab.test', name: 'Alice', password: 'alice-pass-1', role: 'user' },
+  { email: 'bob@lab.test', name: 'Bob', password: 'bob-pass-1', role: 'user' },
+  { email: 'admin@lab.test', name: 'Admin', password: 'admin-pass-1', role: 'admin' },
 ];
 
 const PRODUCTS: Pick<Product, 'name' | 'description' | 'price' | 'category'>[] = [
@@ -60,8 +60,8 @@ export class SeedService {
   private async insertAll(): Promise<void> {
     const users = await this.users.save(
       await Promise.all(
-        USERS.map(async ({ email, password, role }) =>
-          this.users.create({ email, role, passwordHash: await bcrypt.hash(password, 10) }),
+        USERS.map(async ({ email, name, password, role }) =>
+          this.users.create({ email, name, role, passwordHash: await bcrypt.hash(password, 10) }),
         ),
       ),
     );

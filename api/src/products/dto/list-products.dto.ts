@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class ListProductsDto {
   @IsOptional()
@@ -10,4 +10,12 @@ export class ListProductsDto {
   @IsString()
   @MaxLength(50)
   category?: string;
+
+  @IsOptional()
+  @IsIn(['name', 'price', 'category'])
+  sort?: 'name' | 'price' | 'category';
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  dir?: 'asc' | 'desc';
 }

@@ -7,6 +7,13 @@ export interface User {
   role: 'user' | 'admin';
 }
 
+export interface Profile {
+  id: string;
+  email: string;
+  name: string;
+  role: 'user' | 'admin';
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -82,14 +89,21 @@ export const api = {
     return data.user;
   },
   logout: () => auth.clear(),
-  listProducts: (params: { search?: string; category?: string } = {}) => {
+  listProducts: (
+    params: { search?: string; category?: string; sort?: string; dir?: string } = {},
+  ) => {
     const qs = new URLSearchParams();
     if (params.search) qs.set('search', params.search);
     if (params.category) qs.set('category', params.category);
+    if (params.sort) qs.set('sort', params.sort);
+    if (params.dir) qs.set('dir', params.dir);
     const suffix = qs.toString() ? `?${qs}` : '';
     return request<Product[]>(`/products${suffix}`);
   },
   getProduct: (id: string) => request<Product>(`/products/${encodeURIComponent(id)}`),
   listOrders: () => request<Order[]>('/orders'),
   getOrder: (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`),
+  getMe: () => request<Profile>('/users/me'),
+  updateMe: (name: string) =>
+    request<Profile>('/users/me', { method: 'PATCH', body: JSON.stringify({ name }) }),
 };
