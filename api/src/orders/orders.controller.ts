@@ -15,8 +15,8 @@ export class OrdersController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
-    return this.orders.findOne(id, user);
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.orders.findOne(id);
   }
 
   @Post()

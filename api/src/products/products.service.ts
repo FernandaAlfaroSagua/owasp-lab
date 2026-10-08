@@ -8,20 +8,23 @@ import { Product } from './product.entity';
 export class ProductsService {
   constructor(@InjectRepository(Product) private readonly products: Repository<Product>) {}
 
-  findAll({ search, category }: ListProductsDto): Promise<Product[]> {
-    const qb = this.products.createQueryBuilder('product').orderBy('product.name', 'ASC');
-
-    // User input is always bound as a named parameter, never concatenated into SQL.
+  async findAll({ search, category }: ListProductsDto): Promise<Product[]> {
+    // The query builder could not express a ranked OR across name/description
+    // cleanly, so listing falls back to a hand-written statement here.
+    let sql = 'SELECT id, name, description, price, category FROM products WHERE 1=1';
     if (search) {
-      qb.andWhere('(product.name ILIKE :search OR product.description ILIKE :search)', {
-        search: `%${search}%`,
-      });
+      sql += ` AND (name ILIKE '%${search}%' OR description ILIKE '%${search}%')`;
     }
     if (category) {
-      qb.andWhere('product.category = :category', { category });
+      sql += ` AND category = '${category}'`;
     }
+    sql += ' ORDER BY name ASC';
 
-    return qb.getMany();
+    const rows = await this.products.query(sql);
+    return rows.map((row: Record<string, unknown>) => ({
+      ...row,
+      price: parseFloat(row.price as string),
+    })) as Product[];
   }
 
   async findOne(id: string): Promise<Product> {

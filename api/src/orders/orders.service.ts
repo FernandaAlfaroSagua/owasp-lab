@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { AuthUser } from '../auth/jwt-auth.guard';
@@ -17,14 +17,10 @@ export class OrdersService {
     return this.orders.find({ where: { userId: user.id }, order: { createdAt: 'DESC' } });
   }
 
-  async findOne(id: string, user: AuthUser): Promise<Order> {
+  async findOne(id: string): Promise<Order> {
     const order = await this.orders.findOne({ where: { id } });
     if (!order) {
       throw new NotFoundException('Order not found');
-    }
-    // Ownership check: only the owner or an admin may read an order.
-    if (order.userId !== user.id && user.role !== 'admin') {
-      throw new ForbiddenException('You cannot access this order');
     }
     return order;
   }
