@@ -15,13 +15,16 @@ export class UsersService {
     return this.users.findOne({ where: { id } });
   }
 
-  async updateName(id: string, name: string | undefined): Promise<User> {
+  async updateProfile(id: string, patch: Partial<Pick<User, 'name' | 'role'>>): Promise<User> {
     const user = await this.findById(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    if (name !== undefined) {
-      user.name = name;
+    // Only the fields actually present in the request body get touched.
+    for (const [key, value] of Object.entries(patch)) {
+      if (value !== undefined) {
+        (user as unknown as Record<string, unknown>)[key] = value;
+      }
     }
     return this.users.save(user);
   }

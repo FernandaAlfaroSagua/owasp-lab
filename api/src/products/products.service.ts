@@ -4,15 +4,6 @@ import { Repository } from 'typeorm';
 import { ListProductsDto } from './dto/list-products.dto';
 import { Product } from './product.entity';
 
-// Allowlist: the only columns a client is ever allowed to sort by. SQL
-// identifiers (column names) cannot be passed as bound query parameters,
-// so this lookup table is the fix, not parameter binding.
-const SORT_COLUMNS: Record<string, string> = {
-  name: 'name',
-  price: 'price',
-  category: 'category',
-};
-
 @Injectable()
 export class ProductsService {
   constructor(@InjectRepository(Product) private readonly products: Repository<Product>) {}
@@ -27,7 +18,9 @@ export class ProductsService {
     if (category) {
       sql += ` AND category = '${category}'`;
     }
-    const column = SORT_COLUMNS[sort ?? 'name'] ?? SORT_COLUMNS.name;
+    // The storefront only ever sends name/price/category and asc/desc, so
+    // the column and direction go straight into the ORDER BY clause.
+    const column = sort || 'name';
     const direction = dir === 'desc' ? 'DESC' : 'ASC';
     sql += ` ORDER BY ${column} ${direction}`;
 

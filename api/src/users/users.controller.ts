@@ -20,7 +20,7 @@ export class UsersController {
 
   @Patch('me')
   async updateMe(@CurrentUser() user: AuthUser, @Body() dto: UpdateMeDto) {
-    const updated = await this.users.updateName(user.id, dto.name);
+    const updated = await this.users.updateProfile(user.id, dto);
     return this.users.toPublic(updated);
   }
 }

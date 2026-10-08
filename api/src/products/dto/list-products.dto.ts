@@ -1,4 +1,4 @@
-import { IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class ListProductsDto {
   @IsOptional()
@@ -11,11 +11,15 @@ export class ListProductsDto {
   @MaxLength(50)
   category?: string;
 
+  // Just the column/direction names the UI sends, so a fixed list of
+  // options felt like overkill here.
   @IsOptional()
-  @IsIn(['name', 'price', 'category'])
-  sort?: 'name' | 'price' | 'category';
+  @IsString()
+  @MaxLength(200)
+  sort?: string;
 
   @IsOptional()
-  @IsIn(['asc', 'desc'])
-  dir?: 'asc' | 'desc';
+  @IsString()
+  @MaxLength(10)
+  dir?: string;
 }
