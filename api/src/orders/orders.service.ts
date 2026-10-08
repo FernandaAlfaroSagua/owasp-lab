@@ -17,6 +17,11 @@ export class OrdersService {
     return this.orders.find({ where: { userId: user.id }, order: { createdAt: 'DESC' } });
   }
 
+  // Admin-only: every order across every customer.
+  findAllAdmin(): Promise<Order[]> {
+    return this.orders.find({ order: { createdAt: 'DESC' } });
+  }
+
   async findOne(id: string): Promise<Order> {
     const order = await this.orders.findOne({ where: { id } });
     if (!order) {

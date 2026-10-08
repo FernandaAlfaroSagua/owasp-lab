@@ -5,14 +5,21 @@ import { FormEvent, useEffect, useState } from 'react';
 import { api, Product } from '@/lib/api';
 
 const CATEGORIES = ['electronics', 'office', 'books', 'kitchen'];
+const SORT_OPTIONS = [
+  { value: 'name', label: 'Name' },
+  { value: 'price', label: 'Price' },
+  { value: 'category', label: 'Category' },
+];
 
 export default function ProductsPage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [sort, setSort] = useState('name');
+  const [dir, setDir] = useState('asc');
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  async function load(params: { search?: string; category?: string }) {
+  async function load(params: { search?: string; category?: string; sort?: string; dir?: string }) {
     try {
       setError(null);
       setProducts(await api.listProducts(params));
@@ -22,12 +29,13 @@ export default function ProductsPage() {
   }
 
   useEffect(() => {
-    load({});
+    load({ sort, dir });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
-    load({ search, category });
+    load({ search, category, sort, dir });
   }
 
   return (
@@ -47,6 +55,17 @@ export default function ProductsPage() {
               {c}
             </option>
           ))}
+        </select>
+        <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              Sort by {o.label}
+            </option>
+          ))}
+        </select>
+        <select value={dir} onChange={(e) => setDir(e.target.value)}>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
         </select>
         <button type="submit">Search</button>
       </form>

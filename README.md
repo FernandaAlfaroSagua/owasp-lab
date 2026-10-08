@@ -46,11 +46,14 @@ Alice and Bob each have a few orders. There are 15 products in four categories: 
 | Method | Path | Auth | Notes |
 | --- | --- | --- | --- |
 | POST | /auth/login | no | `{ email, password }` returns `{ accessToken, user }` |
-| GET | /products?search=&category= | no | Query builder with bound parameters |
+| GET | /products?search=&category=&sort=&dir= | no | Query builder with bound parameters; `sort` is `name\|price\|category`, `dir` is `asc\|desc`, both allowlisted |
 | GET | /products/:id | no | |
 | GET | /orders | bearer | Only the current user's orders |
 | GET | /orders/:id | bearer | Owner or admin, otherwise 403 |
 | POST | /orders | bearer | `{ items: [{ productId, quantity }] }`; prices come from the database |
+| GET | /users/me | bearer | Current user's profile |
+| PATCH | /users/me | bearer | `{ name }`; the role cannot be changed through this endpoint |
+| GET | /admin/orders | bearer, admin only | Every order across every customer; 403 for non-admins |
 
 Quick check:
 
@@ -70,12 +73,13 @@ owasp-lab/
   api/src/
     main.ts               bootstrap, CORS, validation pipe, first-start seed
     auth/                 login, JwtAuthGuard, CurrentUser decorator
-    users/                User entity and lookup service
-    products/             Product entity, public catalog endpoints
-    orders/               Order entity, ownership-checked endpoints
+    common/                Roles decorator/guard shared across modules
+    users/                User entity, profile lookup/update, GET+PATCH /users/me
+    products/             Product entity, public catalog endpoints, allowlisted sort
+    orders/               Order entity, ownership-checked endpoints, admin-only GET /admin/orders
     seed/                 SeedService and `npm run seed` entry point
   web/
-    app/                  pages: /login, /products, /products/[id], /orders, /orders/[id]
+    app/                  pages: /login, /products, /products/[id], /orders, /orders/[id], /profile
     components/Nav.tsx    top navigation
     lib/api.ts            tiny API client, token kept in localStorage
   docs/
